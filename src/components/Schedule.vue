@@ -4,7 +4,7 @@
       :img-src="item.image"
       img-alt="Image"
       img-left
-      class="mb-3"
+      class="mb-2"
       >
       <b-link :to="item.personUrl">
         <h5>{{item.personName}}</h5>
@@ -14,9 +14,7 @@
       <b-card-text>
         <b-badge v-if="item.isToday" variant="success">Today</b-badge>
         <div v-for="(value, key) in item.schedule" :key="key">
-          <div v-if='value != "-"'>
           {{key}} : {{value}}
-          </div>
         </div>
 
       </b-card-text>
@@ -43,10 +41,9 @@ export default class Schedule extends Vue {
   }
 
   private getSchedule() {
-    let apiUrl = 'https://us-central1-higapro-180014.cloudfunctions.net/higa-check';
-
     const urlsJson: {urls: string[]} = require('../assets/url.json');
-    apiUrl += urlsJson.urls.reduce((prev: string, current: string) => { return prev + '&url=' + current; }, '?');
+    const apiUrl: string = 'https://us-central1-higapro-180014.cloudfunctions.net/higa-check'
+      + urlsJson.urls.reduce((prev: string, current: string) => { return prev + '&url=' + current; }, '?');
 
     this.items = [];
 
@@ -57,20 +54,21 @@ export default class Schedule extends Vue {
     const now = new Date();
     const today: string = (now.getMonth() + 1 ) + '/' + now.getDate() + '(' + this.yobi[now.getDay()] + ')';
 
-    response.forEach((value: ResponseItem) => {
-      const todaySchedule: string = value.schedule[today];
-      if (todaySchedule.match(/^\d{1,2}:\d{2}/)) {
-        value.isToday = true;
+    response.forEach((responseItem: ResponseItem) => {
+      const matcher: RegExp = /^\d{1,2}:\d{2}/;
+      const todaySchedule: string = responseItem.schedule[today];
+      if (todaySchedule.match(matcher)) {
+        responseItem.isToday = true;
       }
 
       const schedule: {[key: string]: string} = {};
-      Object.keys(value.schedule).forEach((key: string) => {
-        if (value.schedule[key].match(/^\d{1,2}:\d{2}/)) {
-          schedule[key] = value.schedule[key];
+      Object.keys(responseItem.schedule).forEach((key: string) => {
+        if (responseItem.schedule[key].match(matcher)) {
+          schedule[key] = responseItem.schedule[key];
         }
       });
-      value.schedule = schedule;
-      this.items.push(value);
+      responseItem.schedule = schedule;
+      this.items.push(responseItem);
     });
   }
 
@@ -90,18 +88,4 @@ export default class Schedule extends Vue {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
 </style>
