@@ -4,15 +4,16 @@
   </div>
 </template>
 
-<script>
-import Schedule from './components/Schedule.vue'
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator';
+import Schedule from './components/Schedule.vue';
 
-export default {
-  name: 'app',
+@Component({
   components: {
-    Schedule
-  }
-}
+    Schedule,
+  },
+})
+export default class App extends Vue {}
 </script>
 
 <style>
