@@ -2,7 +2,7 @@
   <div>
     <b-card v-for="(item, index) in items" :key="index">
       <b-media>
-        <b-img slot="aside" width="64" :src="item.image" />
+        <b-img slot="aside" width="64" :src="item.image" style="height: 100%" />
 
         <b-media-body>
           <b-link :to="item.personUrl">
