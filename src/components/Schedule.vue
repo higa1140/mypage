@@ -1,23 +1,23 @@
 <template>
   <div>
-    <b-card v-for="(item, index) in items" :key="index"
-      :img-src="item.image"
-      img-alt="Image"
-      img-left
-      class="mb-2"
-      >
-      <b-link :to="item.personUrl">
-        <h5>{{item.personName}}</h5>
-      </b-link>
+    <b-card v-for="(item, index) in items" :key="index">
+      <b-media>
+        <b-img slot="aside" width="64" :src="item.image" />
 
-      <a :href="item.shopUrl" class="card-link">{{item.shopName}} ({{item.place}})</a>
-      <b-card-text>
-        <b-badge v-if="item.isToday" variant="success">Today</b-badge>
-        <div v-for="(value, key) in item.schedule" :key="key">
-          {{key}} : {{value}}
-        </div>
+        <b-media-body>
+          <b-link :to="item.personUrl">
+            <h5>{{item.personName}}</h5>
+          </b-link>
 
-      </b-card-text>
+          <a :href="item.shopUrl" class="card-link">{{item.shopName}} ({{item.place}})</a>
+          
+          <b-badge v-if="item.isToday" variant="success">Today</b-badge>
+          <div v-for="(value, key) in item.schedule" :key="key">
+            {{key}} : {{value}}
+          </div>
+
+        </b-media-body>
+      </b-media>
     </b-card>
   </div>
 </template>
@@ -42,7 +42,7 @@ export default class Schedule extends Vue {
 
   private getSchedule() {
     const urlsJson: {urls: string[]} = require('../assets/url.json');
-    const apiUrl: string = 'https://us-central1-higapro-180014.cloudfunctions.net/higa-check'
+    const apiUrl: string = 'https://us-central1-higapro-180014.cloudfunctions.net/higa-check-osmosis'
       + urlsJson.urls.reduce((prev: string, current: string) => { return prev + '&url=' + current; }, '?');
 
     this.items = [];
