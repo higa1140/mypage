@@ -25,36 +25,49 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 
-interface ResponseItem {
+interface GetScheduleResponse {
   schedule: {[key: string]: string};
   isToday: boolean;
+}
 
+interface GetUrlsResponse {
+  urls: string[];
 }
 
 @Component
 export default class Schedule extends Vue {
   private yobi: string[] = new Array('日', '月', '火', '水', '木', '金', '土');
-  private items: ResponseItem[] = [];
+  private items: GetScheduleResponse[] = [];
   constructor() {
     super();
-    this.getSchedule();
+    this.getUrls();
   }
 
-  private getSchedule() {
-    const urlsJson: {urls: string[]} = require('../assets/url.json');
+  private getUrls() {
+    const url = 'https://us-central1-higapro-180014.cloudfunctions.net/higa-check-config';
+    this.requestAjax(url, this.getUrlsCallback);
+  }
+
+  private getUrlsCallback(response: GetUrlsResponse[]) {
+    this.getSchedule(response[0].urls);
+  }
+
+  private getSchedule(urls: string[]) {
     const apiUrl: string = 'https://us-central1-higapro-180014.cloudfunctions.net/higa-check-osmosis'
-      + urlsJson.urls.reduce((prev: string, current: string) => { return prev + '&url=' + current; }, '?');
+      + urls.reduce((prev: string, current: string) => { return prev + '&url=' + current; }, '?');
 
     this.items = [];
 
     this.requestAjax(apiUrl, this.apiCallback);
   }
 
-  private apiCallback(response: ResponseItem[])  {
+
+
+  private apiCallback(response: GetScheduleResponse[])  {
     const now = new Date();
     const today: string = (now.getMonth() + 1 ) + '/' + now.getDate() + '(' + this.yobi[now.getDay()] + ')';
 
-    response.forEach((responseItem: ResponseItem) => {
+    response.forEach((responseItem: GetScheduleResponse) => {
       const matcher: RegExp = /^\d{1,2}:\d{2}/;
       const todaySchedule: string = responseItem.schedule[today];
       if (todaySchedule.match(matcher)) {
