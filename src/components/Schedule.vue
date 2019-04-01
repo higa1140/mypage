@@ -66,9 +66,13 @@ export default class Schedule extends Vue {
   private apiCallback(response: GetScheduleResponse[])  {
     const now = new Date();
     const today: string = (now.getMonth() + 1 ) + '/' + now.getDate() + '(' + this.yobi[now.getDay()] + ')';
-
     response.forEach((responseItem: GetScheduleResponse) => {
       const matcher: RegExp = /^\d{1,2}:\d{2}/;
+
+      if (!responseItem.schedule || Object.keys(responseItem.schedule).length === 0) {
+        return;
+      }
+
       const todaySchedule: string = responseItem.schedule[today];
       if (todaySchedule.match(matcher)) {
         responseItem.isToday = true;
