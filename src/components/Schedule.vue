@@ -24,6 +24,8 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
+import { AjaxUtil } from '../util/AjaxUtil';
+import { LocalStorageUtil } from '../util/LocalStorageUtil';
 
 interface GetScheduleResponse {
   schedule: {[key: string]: string};
@@ -44,11 +46,17 @@ export default class Schedule extends Vue {
   }
 
   private getUrls() {
+    const urls: string[] | null = LocalStorageUtil.getLocalStorage('url');
+    if (urls) {
+      return this.getSchedule(urls);
+    }
+
     const url = 'https://us-central1-higapro-180014.cloudfunctions.net/higa-check-config';
-    this.requestAjax(url, this.getUrlsCallback);
+    AjaxUtil.requestAjax(url, this.getUrlsCallback);
   }
 
   private getUrlsCallback(response: GetUrlsResponse[]) {
+    LocalStorageUtil.setLocalStorage('url', response[0].urls);
     this.getSchedule(response[0].urls);
   }
 
@@ -58,10 +66,8 @@ export default class Schedule extends Vue {
 
     this.items = [];
 
-    this.requestAjax(apiUrl, this.apiCallback);
+    AjaxUtil.requestAjax(apiUrl, this.apiCallback);
   }
-
-
 
   private apiCallback(response: GetScheduleResponse[])  {
     const now = new Date();
@@ -87,18 +93,6 @@ export default class Schedule extends Vue {
       responseItem.schedule = schedule;
       this.items.push(responseItem);
     });
-  }
-
-  private requestAjax(endpoint: string, callback: (response: any) => void) {
-    const xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = function() {
-      if (this.readyState === 4 && this.status === 200) {
-        callback(this.response);
-      }
-    };
-    xhr.responseType = 'json';
-    xhr.open('GET', endpoint, true);
-    xhr.send();
   }
 }
 </script>
