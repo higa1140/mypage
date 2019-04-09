@@ -1,0 +1,20 @@
+version: 2
+
+jobs:
+  build:
+    working_directory: ~/
+    docker:
+      - image: node:9.11
+        environment:
+          DEPLOY_BRANCH: master
+
+    steps:
+      - checkout
+
+      - run:
+          name: Deploy development branch to master
+          command: |
+            if [ "${CIRCLE_BRANCH}" = "${DEPLOY_BRANCH}" ]; then
+              chmod +x deploy.sh
+              ./deploy.sh
+            fi
