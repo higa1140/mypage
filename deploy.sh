@@ -20,5 +20,3 @@ git commit -m "[ci skip] Deploy by CI"
 git push -f $(git config --get remote.origin.url) gh-pages
 
 echo "Deploy a site!"
-
-cd -
