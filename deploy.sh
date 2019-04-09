@@ -3,7 +3,7 @@
 git config --global user.name "Circle CI"
 git config --global user.email "<>"
 git checkout -b gh-pages origin/gh-pages
-git pull origin master --no-edit
+git pull --no-edit origin master
 
 npm install
 
